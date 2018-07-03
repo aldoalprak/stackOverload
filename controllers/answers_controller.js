@@ -37,6 +37,16 @@ class Answer {
         })
     }
 
+    static delete(req,res) {
+        AnswerModel.deleteOne({_id:req.params.id})
+        .then(result=>{
+            res.status(200).json({message:"answer deleted",result})
+        })
+        .catch(err=>{
+            res.status(500).json({message:err.message})
+        })
+    }
+
 }
 
 module.exports = Answer
