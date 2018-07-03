@@ -47,6 +47,26 @@ class Question {
             }
         })
     }
+    static delete(req,res) {
+        QuestionModel.deleteOne({_id:req.params.id})
+        .then(result=>{
+            console.log("masuk",req.params.id);
+            res.status(200).json({message:"question deleted",result})
+        })
+        .catch(err=>{
+            res.status(500).json({message:err.message})
+        })
+    }
+
+    static update(req,res) {
+        QuestionModel.updateOne({_id:req.params.id},{$set:req.body})
+        .then(result=>{
+            res.status(200).json({message:"question updated",result})
+        })
+        .catch(err=>{
+            res.status(500).json({message:err.message})
+        })
+    }
 
 }
 

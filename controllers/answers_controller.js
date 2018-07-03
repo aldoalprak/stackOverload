@@ -38,14 +38,59 @@ class Answer {
     }
 
     static delete(req,res) {
-        AnswerModel.deleteOne({_id:req.params.id})
-        .then(result=>{
-            res.status(200).json({message:"answer deleted",result})
+        const decoded = jwt.verify(req.headers.token,"helloworld123")
+        AnswerModel.findById({_id:req.params.id})
+        .then(dataAnswer=>{
+            if(dataAnswer) {
+                if(dataAnswer.userId == decoded.userId) {
+                    AnswerModel.deleteOne({_id:req.params.id})
+                    .then(result=>{
+                        res.status(200).json({message:"answer deleted",result})
+                    })
+                    .catch(err=>{
+                        res.status(500).json({message:err.message})
+                    })
+                }else{
+                    res.status(500).json({message:"you dont have authorized"})
+                }    
+            }else{
+                res.status(500).json({message:"answer not found"})
+            }
         })
         .catch(err=>{
             res.status(500).json({message:err.message})
         })
     }
+
+    static update(req,res) {
+        AnswerModel.find({_id:req.params.id})
+        .then(dataAnswer=>{
+            if(dataAnswer) {
+                const decoded = jwt.verify(req.headers.token,"helloworld123")
+                if(dataAnswer[0].userId == decoded.userId) {
+                    AnswerModel.updateOne({_id:req.params.id},{$set:req.body})
+                    .then(result=>{
+                        res.status(200).json({message:"answer updated",result})
+                    })
+                    .catch(err=>{
+                        res.status(500).json({message:err.message})
+                    })
+                }else{
+                    console.log("xx")
+                    res.status(500).json({message:"you dont have authorized"})
+                }
+            }else{
+                res.status(500).json({message:"answer not found"})
+            }
+        })
+        .catch(err=>{
+            console.log(dataArticle,"====")
+            res.status(500).json({message:err.message})
+        })
+        
+    }
+
+    
 
 }
 
