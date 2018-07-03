@@ -1,25 +1,40 @@
 const AnswerModel = require('../models/answer.js')
+const QuestionModel = require('../models/question.js')
 const jwt = require("jsonwebtoken")
 
 class Answer {
 
     static add(req,res) {
         const decoded = jwt.verify(req.headers.token,"helloworld123")
-        const dataPost = {
+        const dataAnswer = {
             content: req.body.content,
+            votes:[],
+            questionId:req.body.questionId
         }
-        dataPost.userId = decoded.userId
-        postModel.create(dataPost)
-        .then(dataPost=>{
-            res.status(200).json({message:"post sent!!",dataPost})
+        dataAnswer.userId = decoded.userId
+        AnswerModel.create(dataAnswer)
+        .then(dataAnswer=>{
+            QuestionModel.findOne({_id:req.body.questionId})
+            .then(dataQuestion=>{
+                dataQuestion.answerId.push(dataAnswer._id)
+                dataQuestion.save()
+            })
+            res.status(200).json({message:"post sent!!",dataAnswer})
         })
         .catch(err=>{
             res.status(500).json({message:err.message})
         })
     }
 
-    static show(req,res) {
-        
+    static showByPostId(req,res) {
+        AnswerModel.find({questionId:req.params.id})
+        .populate('userId','username')
+        .then(dataAnswer=>{
+            res.status(200).json({dataAnswer})
+        })
+        .catch(err=>{
+            res.status(500).json({message:err.message})
+        })
     }
 
 }

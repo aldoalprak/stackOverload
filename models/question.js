@@ -3,9 +3,16 @@ const Schema = mongoose.Schema
 const ObjectId = Schema.Types.ObjectId
 
 const questionSchema = new Schema({
+    title: {
+        type:String,
+        unique:true
+    },
     content: String,
-    like:[],
-    answers:[],
+    votes:[],
+    answerId:[{
+        type: ObjectId,
+        ref: "Answer"
+    }],
     userId: {
         type: ObjectId,
         ref: "User"
