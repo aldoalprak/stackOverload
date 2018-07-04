@@ -6,8 +6,12 @@ var logger = require('morgan');
 const cors = require('cors')
 require('dotenv').config()
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://alprak:rotitawarmanis12@ds121871.mlab.com:21871/hacktiv_overflow',function(err){
-  console.log("db connected");
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds121871.mlab.com:21871/hacktiv_overflow`,function(err){
+  if(err) {
+    console.log(err);
+  }else{
+    console.log("db connected");
+  }
   
 });
 
