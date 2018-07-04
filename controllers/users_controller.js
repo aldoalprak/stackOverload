@@ -32,7 +32,7 @@ class User {
     }
 
     static showOne(req,res) {
-        const decoded = jwt.verify(req.headers.token,"helloworld123")
+        const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
         UserModel.findOne({_id: decoded.userId})
         .then(dataUser=>{
             res.status(200).json(dataUser)
@@ -49,14 +49,14 @@ class User {
 				if(req.body.password!== undefined) {
 					bcrypt.compare(req.body.password,dataUser.password,function(err,response) {
 						if(response) {
-							var token = jwt.sign({ userId: dataUser._id }, "helloworld123");
+							var token = jwt.sign({ userId: dataUser._id }, process.env.JWT_SALT);
 							res.status(200).json({message:"signin succeed",token})
 						}else{
 							res.status(400).json({message:"incorrect password/username"})	
 						}
 					})
 				}else{
-					var token = jwt.sign({ userId: dataUser._id }, "helloworld123")
+					var token = jwt.sign({ userId: dataUser._id }, process.env.JWT_SALT)
 					res.status(200).json({message:"signin succeed",token})
 				}	
 			}else{
@@ -71,7 +71,7 @@ class User {
 
 					UserModel.create(dataInputUser)
 					.then(dataUser=>{
-						var token = jwt.sign({ userId: dataUser._id }, "helloworld123")
+						var token = jwt.sign({ userId: dataUser._id }, process.env.JWT_SALT)
 						res.status(200).json({message:"signin succeed",token})
 					})
 					.catch(err=>{

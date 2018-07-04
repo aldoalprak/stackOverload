@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 class Answer {
 
     static add(req,res) {
-        const decoded = jwt.verify(req.headers.token,"helloworld123")
+        const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
         const dataAnswer = {
             content: req.body.content,
             votes:[],
@@ -38,7 +38,7 @@ class Answer {
     }
 
     static delete(req,res) {
-        const decoded = jwt.verify(req.headers.token,"helloworld123")
+        const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
         AnswerModel.findById({_id:req.params.id})
         .then(dataAnswer=>{
             if(dataAnswer) {
@@ -46,6 +46,12 @@ class Answer {
                     AnswerModel.deleteOne({_id:req.params.id})
                     .then(result=>{
                         res.status(200).json({message:"answer deleted",result})
+                        QuestionModel.findOne({_id:req.body.questionId})
+                        .then(dataQuestion=>{
+                            let index = dataQuestion.answerId.indexOf(req.params.id)
+                            dataQuestion.answerId.splice(index,1)
+                            dataQuestion.save()
+                        })
                     })
                     .catch(err=>{
                         res.status(500).json({message:err.message})
@@ -66,7 +72,7 @@ class Answer {
         AnswerModel.find({_id:req.params.id})
         .then(dataAnswer=>{
             if(dataAnswer) {
-                const decoded = jwt.verify(req.headers.token,"helloworld123")
+                const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
                 if(dataAnswer[0].userId == decoded.userId) {
                     AnswerModel.updateOne({_id:req.params.id},{$set:req.body})
                     .then(result=>{
@@ -87,10 +93,25 @@ class Answer {
             console.log(dataArticle,"====")
             res.status(500).json({message:err.message})
         })
-        
+    }
+    static upvote(req,res) {
+        console.log(req.params.id,"asdasdasdasd");
+        AnswerModel.findById(req.params.id)
+        .then(dataAnswer=>{
+            dataAnswer.votes.push(req.body.userId)
+            dataAnswer.save()
+            res.status(200).json(dataAnswer)
+        })
     }
 
-    
+    static downvote(req,res) {
+        AnswerModel.findById(req.params.id)
+        .then(dataAnswer=>{
+            dataAnswer.votes = req.body.currVotes
+            dataAnswer.save()
+            res.status(200).json(dataAnswer)
+        })
+    }    
 
 }
 

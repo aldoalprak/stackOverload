@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 class Question {
 
     static add(req,res) {
-        const decoded = jwt.verify(req.headers.token,"helloworld123")
+        const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
         const dataQuestion = {
             title: req.body.title,
             content: req.body.content,
@@ -65,6 +65,25 @@ class Question {
         })
         .catch(err=>{
             res.status(500).json({message:err.message})
+        })
+    }
+
+    static upvote(req,res) {
+        console.log(req.params.id,"asdasdasdasd");
+        QuestionModel.findById(req.params.id)
+        .then(dataQuestion=>{
+            dataQuestion.votes.push(req.body.userId)
+            dataQuestion.save()
+            res.status(200).json(dataQuestion)
+        })
+    }
+
+    static downvote(req,res) {
+        QuestionModel.findById(req.params.id)
+        .then(dataQuestion=>{
+            dataQuestion.votes = req.body.currVotes
+            dataQuestion.save()
+            res.status(200).json(dataQuestion)
         })
     }
 

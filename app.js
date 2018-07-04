@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors')
+require('dotenv').config()
 const mongoose = require('mongoose')
 mongoose.connect('mongodb://alprak:rotitawarmanis12@ds121871.mlab.com:21871/hacktiv_overflow',function(err){
   console.log("db connected");
