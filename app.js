@@ -1,12 +1,12 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const cors = require('cors')
 require('dotenv').config()
 const mongoose = require('mongoose')
-mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds121871.mlab.com:21871/hacktiv_overflow`,function(err){
+mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds045475.mlab.com:45475/hacktiv_overflow`,function(err){
   if(err) {
     console.log(err);
   }else{
@@ -15,11 +15,12 @@ mongoose.connect(`mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds1218
   
 });
 
-var usersRouter = require('./routes/users');
-var answersRouter = require('./routes/answers')
-var questionsRouter = require('./routes/questions')
+let indexRouter = require('./routes/index');
+let usersRouter = require('./routes/users');
+let answersRouter = require('./routes/answers')
+let questionsRouter = require('./routes/questions')
 
-var app = express();
+let app = express();
 
 app.use(cors())
 // view engine setup
@@ -32,7 +33,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+app.use('/', indexRouter)
 app.use('/users', usersRouter);
 app.use('/answers', answersRouter)
 app.use('/questions', questionsRouter)

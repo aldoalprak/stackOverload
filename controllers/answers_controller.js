@@ -90,27 +90,44 @@ class Answer {
             }
         })
         .catch(err=>{
-            console.log(dataArticle,"====")
             res.status(500).json({message:err.message})
         })
     }
     static upvote(req,res) {
-        console.log(req.params.id,"asdasdasdasd");
-        AnswerModel.findById(req.params.id)
-        .then(dataAnswer=>{
-            dataAnswer.votes.push(req.body.userId)
-            dataAnswer.save()
-            res.status(200).json(dataAnswer)
-        })
+        try {
+          const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
+          AnswerModel.findById(req.params.id)
+          .then(dataAnswer=>{
+              dataAnswer.votes.push(decoded.userId)
+              dataAnswer.save()
+              res.status(200).json(dataAnswer)
+          }) 
+        } catch (err) {
+          res.status(500).json({message:err.message})
+        }
     }
 
     static downvote(req,res) {
+      try {
+        const decoded = jwt.verify(req.headers.token,process.env.JWT_SALT)
         AnswerModel.findById(req.params.id)
         .then(dataAnswer=>{
-            dataAnswer.votes = req.body.currVotes
+          const votesArr= dataAnswer.votes
+          const deleteIndex = votesArr.indexOf(decoded.userId)
+          if(deleteIndex > -1) {
+            votesArr.splice(deleteIndex, 1)
+            dataAnswer.votes = votesArr
             dataAnswer.save()
             res.status(200).json(dataAnswer)
-        })
+          } else {
+            res.status(200).json({message: "userId not found"})
+          }
+         
+        })  
+      } catch (error) {
+        
+      }
+        
     }    
 
 }
